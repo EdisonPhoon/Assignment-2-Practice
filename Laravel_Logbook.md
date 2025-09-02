@@ -1,6 +1,6 @@
 # Laravel CRUD Operation
 
-## *May the Machine God steady your programming* [^1]
+## *May the Machine God steady your programming*
 
 **Project:** Assignment 2 Practice (A2P)
 
@@ -15,9 +15,9 @@ ___
 **Session:** 31-08-2025
 
 **Remark:** 
-> The Machine Spirit is not cooperative today [^4]
+> The Machine Spirit is not cooperative today
 
-> Logbook structure was recalibrated as of 31/08/25 or 31-08-25:M3 (2025, 3rd millennium) [^6]
+> Logbook structure was recalibrated as of 31/08/25 or 31-08-25:M3 (2025, 3rd millennium)
 
 
 # 1. Check requirements 
@@ -398,21 +398,21 @@ ___
 *Fun Text Section*
 
 
-[^a]: It means "Good luck to your code!"
+[^1]: It means "Good luck to your code!"
 
-[^b]: It means that the developer's local device had multiple problems throughout session
+[^2]: It means that the developer's local device had multiple problems throughout session
 
-[^c]: It means to use common sense through the process due to self-explanatory instructions
+[^3]: It means to use common sense through the process due to self-explanatory instructions
 
-[^d]: It means that logbook had to be re-written entirely due to restarting from square one
+[^4]: It means that logbook had to be re-written entirely due to restarting from square one
 
 
 *Normal Footnote Section*
 
 
-[^2]: (Currently this is unused)
+[^5]: (Currently this is unused)
 
-[^3]: (Currently this is unused)
+[^6]: (Currently this is unused)
 
 [^7]: Former instruction to initiating a connection between Laravel Herd to TablePlus. But the Machine Spirit's unrest caused multiple problems before it was resolved
 
