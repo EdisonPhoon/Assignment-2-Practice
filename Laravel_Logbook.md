@@ -397,6 +397,7 @@ ___
 
 *Fun Text Section*
 
+
 [^a]: It means "Good luck to your code!"
 
 [^b]: It means that the developer's local device had multiple problems throughout session
@@ -405,7 +406,9 @@ ___
 
 [^d]: It means that logbook had to be re-written entirely due to restarting from square one
 
+
 *Normal Footnote Section*
+
 
 [^2]: (Currently this is unused)
 
