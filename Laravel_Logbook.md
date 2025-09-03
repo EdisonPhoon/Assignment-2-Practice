@@ -12,7 +12,8 @@
 
 ___
 
-**Session:** 31-08-2025
+**Start Session:** 31-08-2025
+**End Session:** 01-09-2025
 
 **Remark:** 
 > The Machine Spirit is not cooperative today
@@ -220,7 +221,8 @@ git push -u origin main
 ___
 
 
-**Session:** 01-09-2025
+**Start Session:** 01-09-2025
+**End Session:** 03-09-2025
 
 **Remark:** 
 > The Machine Spirit proved surprisingly cooperative today
@@ -246,7 +248,7 @@ powershell
 & "C:\Program Files\MySQL\MySQL Server 9.4\bin\mysql.exe" -u root -p
 ```
 
-4. Use `**SHOW DATABASES;**` to check if created database was successful
+4. Run this to check if created database was successful
 ```
 mysql
 
@@ -290,7 +292,9 @@ DB_PASSWORD=admin@12345
 ___
 
 
-# 8. Initiate Laravel Migration
+# 8. Laravel Migration
+
+💡 **Context:** Migration is a **system** that enables the *creating* and *modifying* of a table through PHP instead of SQL
 
 1. Type this in your terminal within your workspace file
 ```
@@ -299,28 +303,9 @@ bash
 php artisan make:migration create_40k_starter_book --create=books
 ```
 
+2. Go to recently created table
 
-___
-
-
-# 9. Modify the Migration Table
-
-1. Go to recently migration table
-
-2. Look for the *up* method
-```
-php
-
-public function up(): void
-    {
-        Schema::create('books', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
-    }
-```
-
-3. Modify to this
+2. Insert this in the `up` method
 ```
 php
 
@@ -338,9 +323,9 @@ public function up(): void
 
 4. Run **php artisan migrate** to apply the migration.
 
-5. Code Analysis
+## Code Analysis
 
-### ID Field
+**ID Field**
 ```
 php
 
@@ -348,7 +333,7 @@ $table->id();
 ```
 This declares a **primary key column** named `id`. This field auto-increments with each migration.
 
-### Chapter Field
+**Chapter Field**
 ```
 php
 
@@ -356,7 +341,7 @@ $table->string('chapter', 40)->nullable(false);
 ```
 This declares a **string column** named `chapter` (40 characters maximum). This field is required.
 
-### Price Field
+**Price Field**
 ```
 php
 
@@ -364,15 +349,15 @@ $table->integer('price')->nullable(false);
 ```
 This declares an **integer column** named `price` (no character limit). This field is required.
 
-### Author Field
+**Author Field**
 ```
 php
 
 $table->string('author', 80)->nullable(false);
 ```
-This declares an **integer column** named `author` (80 character maximum). This field is required.
+This declares an **string column** named `author` (80 character maximum). This field is required.
 
-### Timestamp Field
+**Timestamp Field**
 ```
 php
 
@@ -380,8 +365,260 @@ $table->timestamps();
 ```
 This declares 2 **timestamp columns** named `created_at` and `updated_at`. This field is generated automatically.
 
+___
+
+**Error Output:**
+```
+powershell
+
+php artisan migrate
+
+    Illuminate\Database\QueryException 
+
+    SQLSTATE[HY000] [1045] Access denied for user 'edison'@'localhost' (using password: YES) (Connection: mysql, SQL: select exists (select 1 from information_schema.tables where table_schema = schema() and table_name = 'migrations' and table_type in ('BASE TABLE', 'SYSTEM VERSIONED')) as `exists`)
+
+    at vendor\laravel\framework\src\Illuminate\Database\Connection.php:824
+    820▕                $this->getName(), $query, $this->prepareBindings($bindings), $e
+    821▕                    );
+    822▕                }
+    823▕
+    ➜ 824▕             throw new QueryException(
+    825▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+    826▕             );
+    827▕         }
+    828▕     }
+
+    1   vendor\laravel\framework\src\Illuminate\Database\Connectors\Connector.php:67
+        PDOException::("SQLSTATE[HY000] [1045] Access denied for user 'edison'@'localhost' (using password: YES)")
+
+    2   vendor\laravel\framework\src\Illuminate\Database\Connectors\Connector.php:67
+        PDO::connect("mysql:host=127.0.0.1;port=3306;dbname=a2p", "edison", Object(SensitiveParameterValue), [])
+```
+
+**Solution:**
+
+1. Use the root password
+```
+powershell
+
+& "C:\Program Files\MySQL\MySQL Server 9.4\bin\mysql.exe" -u root -p
+```
+
+2. Check if `edison` exists
+```
+mysql
+
+SELECT user, host, plugin FROM mysql.user WHERE user = 'edison';
+ALTER USER 'edison'@'localhost' IDENTIFIED WITH caching_sha2_password BY 'admin@12345678';
+GRANT ALL PRIVILEGES ON a2p.* TO 'edison'@'localhost';
+FLUSH PRIVILEGES;
+exit
+```
+
+3. Ensure that the password in .env file is the same one in the MySQL server
+```
+bash
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=a2p
+DB_USERNAME=edison
+DB_PASSWORD=admin@12345678
+MYSQL_ATTR_SSL_CA=null
+```
+
+4. Retry migration
+```
+bash
+
+php artisan migrate
+```
+
+
+# 10. Creating a Model
+
+1. Create the model
+```
+bash
+
+php artisan make:model Book
+```
+
+2. Insert `protected $fillable` for mass assignment
+```
+php
+
+// Allow mass assignment for these columns
+    protected $fillable = ['name', 'price', 'author'];
+```
+💡 **Context:** $fillable states which field should be automatically filled in.
+
+
+# 11. Initiating a Seeding
+
+1. Run this
+```
+bash
+php artisan make:seeder BookSeeder
+```
+💡 **Context:** A seeding is inserting data into the table *when the application starts* via running commands.
+
+2. Navigate to `database/seeders` and open `BookSeeder.php`.
+
+3. Modify to your liking. Here is an example.
+
+```
+php
+
+public function run(): void
+    {
+        // Clean table every time app opens
+        DB::table('books')->truncate();
+
+        // Add new row with these data
+        $books = [
+            ['name' => 'Book of the Machine God', 'price' => 30, 'author' => 'Games Workshop'],
+            ['name' => 'Starter Book of Warhammer 40K', 'price' => 25, 'author' => 'Games Workshop'],
+            ['name' => 'Advanced Book of Warhammer 40K', 'price' => 40, 'author' => 'Games Workshop']
+        ];
+    }
+```
+📝 **Note:** Since the prerequiste is to have `created at` and `updated at` timestamps automatically assigned.
+
+4. Run `php artisan db:seed` to apply seeding
+
+**Error Output:**
+```
+php
+
+php artisan db:seed
+
+   INFO  Seeding database.
+
+
+   Error 
+
+  Class "Database\Seeders\DB" not found
+
+  at database\seeders\DatabaseSeeder.php:17
+     13▕      */
+     14▕     public function run(): void
+     15▕     {
+     16▕         // Clean table every time app opens
+  ➜  17▕         DB::table('books')->truncate();
+     18▕
+     19▕         // Add new row with these data
+     20▕         $books = [
+     21▕             ['name' => 'Book of the Machine God', 'price' => 30, 'author' => 'Games Workshop'],
+
+  1   vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:36
+      Database\Seeders\DatabaseSeeder::run()
+
+  2   vendor\laravel\framework\src\Illuminate\Container\Util.php:43
+      Illuminate\Container\BoundMethod::{closure:Illuminate\Container\BoundMethod::call():35}()
+```
+
+**Solution:**
+```
+php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use App\Models\Book;
+
+class DatabaseSeeder extends Seeder
+{
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
+    {
+        // Clean table every time app opens
+        Book::truncate();
+
+        // Define the seed data
+        $books = [
+            ['name' => 'Book of the Machine God', 'price' => 30, 'author' => 'Games Workshop'],
+            ['name' => 'Starter Book of Warhammer 40K', 'price' => 25, 'author' => 'Games Workshop'],
+            ['name' => 'Advanced Book of Warhammer 40K', 'price' => 40, 'author' => 'Games Workshop'],
+        ];
+
+        // Insert each book using Eloquent, timestamps will auto-generate
+        foreach ($books as $book) {
+            Book::create($book);
+        }
+
+        $this->command->info('Books table seeded successfully!');
+    }
+}
+```
+
+# 11. Controller & Routing
+
+1. Type this into `web.php` at `/routes/`
+
+```
+php
+
+use App\Http\Controllers\BookController;
+
+Route::get('book', 'BookController@index');
+```
+
+This enables the Machine Spirit's client request to be directed to the *controller* rather than *returned*.
+
+2. Create the controller
+```
+bash
+php artisan make:controller BookController
+```
+
+3. Insert this after **namespace**
+```
+php
+
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Book;
+```
+
+4. Write the method to **retrieve all books**
+```
+php
+
+class BookController extends Controller {
+    public function index() {
+    // Retrieve all values from the Book table
+    $books = Book::all();
+
+
+    // Pass the retrieved values to the “book/index” view
+    return view('book/index', compact('books'));
+    }
+}
+```
+
+5. Write the method to **edit a book**
+```
+php
+
+public function edit($id) {
+    $book = Book::findOrFail($id);
+
+    return view('book/edit', compact('book') );
+}
+```
 
 ___
+
+Annotation Used:
+
+💡 **Context:** 
+
+📝 **Note:** 
+
 
 ## Disclaimer
 - The Developer has an interest in Warhammer 40K lore. 
