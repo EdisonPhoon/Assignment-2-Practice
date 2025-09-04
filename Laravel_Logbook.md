@@ -123,9 +123,9 @@ DB_PASSWORD=admin@12345
 
 # 8. Laravel Migration
 
-💡 **Context:** Migration is a **system** that enables the *creating* and *modifying* of a table through PHP instead of SQL
+Migration is a **system** that enables the *creating* and *modifying* of a table through PHP instead of SQL
 
-1. Run this to create a migration file
+1. Create migration file
 ```
 bash
 
@@ -160,85 +160,15 @@ public function up(): void
 
 3. Run **php artisan migrate** to apply the migration.
 
-*If a Query Exception occurs, see Appendix A*
+*If a Query Exception occurs, see Appendix D*
 
+# 9. Creating a Model
 
-**Error Output:**
-```
-powershell
-
-php artisan migrate
-
-    Illuminate\Database\QueryException 
-
-    SQLSTATE[HY000] [1045] Access denied for user 'edison'@'localhost' (using password: YES) (Connection: mysql, SQL: select exists (select 1 from information_schema.tables where table_schema = schema() and table_name = 'migrations' and table_type in ('BASE TABLE', 'SYSTEM VERSIONED')) as `exists`)
-
-    at vendor\laravel\framework\src\Illuminate\Database\Connection.php:824
-    820▕                $this->getName(), $query, $this->prepareBindings($bindings), $e
-    821▕                    );
-    822▕                }
-    823▕
-    ➜ 824▕             throw new QueryException(
-    825▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
-    826▕             );
-    827▕         }
-    828▕     }
-
-    1   vendor\laravel\framework\src\Illuminate\Database\Connectors\Connector.php:67
-        PDOException::("SQLSTATE[HY000] [1045] Access denied for user 'edison'@'localhost' (using password: YES)")
-
-    2   vendor\laravel\framework\src\Illuminate\Database\Connectors\Connector.php:67
-        PDO::connect("mysql:host=127.0.0.1;port=3306;dbname=a2p", "edison", Object(SensitiveParameterValue), [])
-```
-
-**Solution:**
-
-1. Use the root password
-```
-powershell
-
-& "C:\Program Files\MySQL\MySQL Server 9.4\bin\mysql.exe" -u root -p
-```
-
-2. Check if `edison` exists
-```
-mysql
-
-SELECT user, host, plugin FROM mysql.user WHERE user = 'edison';
-ALTER USER 'edison'@'localhost' IDENTIFIED WITH caching_sha2_password BY 'admin@12345678';
-GRANT ALL PRIVILEGES ON a2p.* TO 'edison'@'localhost';
-FLUSH PRIVILEGES;
-exit
-```
-
-3. Ensure that the password in .env file is the same one in the MySQL server
+1. *Run this*
 ```
 bash
 
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=a2p
-DB_USERNAME=edison
-DB_PASSWORD=admin@12345678
-MYSQL_ATTR_SSL_CA=null
-```
-
-4. Retry migration
-```
-bash
-
-php artisan migrate
-```
-
-
-# 10. Creating a Model
-
-1. Create the model
-```
-bash
-
-php artisan make:model Book
+php artisan make:model Task
 ```
 
 2. Insert `protected $fillable` for mass assignment
@@ -246,166 +176,248 @@ php artisan make:model Book
 php
 
 // Allow mass assignment for these columns
-    protected $fillable = ['name', 'price', 'author'];
+    protected $fillable = ['name', 'duration', 'author'];
 ```
-💡 **Context:** $fillable states which field should be automatically filled in.
+The `$fillable` property states which field should be automatically filled in.
 
+*If you have a problem where `php artisan db:seed` runs a different Seeder file, see Appendix F*
 
-# 11. Initiating a Seeding
+# 10. Create a Seeder
 
 1. Run this
 ```
 bash
-php artisan make:seeder BookSeeder
+php artisan make:seeder TaskTableSeeder
 ```
-💡 **Context:** A seeding is inserting data into the table *when the application starts* via running commands.
+Seeding is a system enabling the entering of data into tables through PHP instead of SQL.
 
-2. Navigate to `database/seeders` and open `BookSeeder.php`.
-
-3. Modify to your liking. Here is an example.
-
-```
-php
-
-public function run(): void
-    {
-        // Clean table every time app opens
-        DB::table('books')->truncate();
-
-        // Add new row with these data
-        $books = [
-            ['name' => 'Book of the Machine God', 'price' => 30, 'author' => 'Games Workshop'],
-            ['name' => 'Starter Book of Warhammer 40K', 'price' => 25, 'author' => 'Games Workshop'],
-            ['name' => 'Advanced Book of Warhammer 40K', 'price' => 40, 'author' => 'Games Workshop']
-        ];
-    }
-```
-📝 **Note:** Since the prerequiste is to have `created at` and `updated at` timestamps automatically assigned.
-
-4. Run `php artisan db:seed` to apply seeding
-
-**Error Output:**
-```
-php
-
-php artisan db:seed
-
-   INFO  Seeding database.
-
-
-   Error 
-
-  Class "Database\Seeders\DB" not found
-
-  at database\seeders\DatabaseSeeder.php:17
-     13▕      */
-     14▕     public function run(): void
-     15▕     {
-     16▕         // Clean table every time app opens
-  ➜  17▕         DB::table('books')->truncate();
-     18▕
-     19▕         // Add new row with these data
-     20▕         $books = [
-     21▕             ['name' => 'Book of the Machine God', 'price' => 30, 'author' => 'Games Workshop'],
-
-  1   vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:36
-      Database\Seeders\DatabaseSeeder::run()
-
-  2   vendor\laravel\framework\src\Illuminate\Container\Util.php:43
-      Illuminate\Container\BoundMethod::{closure:Illuminate\Container\BoundMethod::call():35}()
-```
-
-**Solution:**
+2. Insert this at `database/seeders/TaskTableSeeder.php`.
 ```
 php
 
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Book;
+use Illuminate\Support\Facades\DB;
 
-class DatabaseSeeder extends Seeder
+class TaskTableSeeder extends Seeder
 {
     /**
-     * Seed the application's database.
+     * Run the database seeds.
      */
-    public function run(): void
-    {
+    public function run(): void {
         // Clean table every time app opens
-        Book::truncate();
+        DB::table('tasks')->truncate();
 
-        // Define the seed data
-        $books = [
-            ['name' => 'Book of the Machine God', 'price' => 30, 'author' => 'Games Workshop'],
-            ['name' => 'Starter Book of Warhammer 40K', 'price' => 25, 'author' => 'Games Workshop'],
-            ['name' => 'Advanced Book of Warhammer 40K', 'price' => 40, 'author' => 'Games Workshop'],
+        // Add new row with these data
+        $tasks = [
+            ['name' => 'Task 1', 'duration' => 30, 'author' => 'User 1'],
+            ['name' => 'Task 2', 'duration' => 25, 'author' => 'User 2'],
+            ['name' => 'Task 3', 'duration' => 40, 'author' => 'User 3'],
+            ['name' => 'Task 4', 'duration' => 20, 'author' => 'User 4'],
         ];
 
-        // Insert each book using Eloquent, timestamps will auto-generate
-        foreach ($books as $book) {
-            Book::create($book);
+        // Insert data into the table
+        foreach ($tasks as $task) {
+            DB::table('tasks')->insert($task);
         }
-
-        $this->command->info('Books table seeded successfully!');
     }
 }
-```
-
-# 11. Controller & Routing
-
-1. Type this into `web.php` at `/routes/`
 
 ```
-php
+We want to have the timestamp field set automatically, so we use the `DB::table('tasks')->insert($task);` method instead of Eloquent's `Task::create($task);` method.
 
-use App\Http\Controllers\BookController;
+3. Run `php artisan db:seed --class=TaskTableSeeder` to apply seeding
 
-Route::get('book', 'BookController@index');
-```
+4. Check in TablePlus if the data has been inserted by typing `mysql> select * from tasks;` in the query window.
 
-This enables the Machine Spirit's client request to be directed to the *controller* rather than *returned*.
+# 11. Create a Controller
 
-2. Create the controller
+1. *Run this*
 ```
 bash
-php artisan make:controller BookController
+
+php artisan make:controller TaskController
 ```
 
-3. Insert this after **namespace**
-```
-php
-
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Book;
-```
-
-4. Write the method to **retrieve all books**
+2. Insert this at `app\Http\Controllers\TaskController.php`
 ```
 php
 
-class BookController extends Controller {
-    public function index() {
-    // Retrieve all values from the Book table
-    $books = Book::all();
+namespace Database\Seeders;
 
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
-    // Pass the retrieved values to the “book/index” view
-    return view('book/index', compact('books'));
+class TaskTableSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void {
+        $this->call(TaskTableSeeder::class);
+
+        // Clean table every time app opens
+        DB::table('tasks')->truncate();
+
+        // Add new row with these data
+        $tasks = [
+            ['name' => 'Task 1', 'duration' => 30, 'author' => 'User1'],
+            ['name' => 'Task 2', 'duration' => 25, 'author' => 'User2'],
+            ['name' => 'Task 3', 'duration' => 40, 'author' => 'User3'],
+        ];
+
+        // Insert data into the table
+        foreach ($tasks as $task) {
+            DB::table('tasks')->insert($task);
+        }
     }
 }
+
 ```
 
-5. Write the method to **edit a book**
+*If `php artisan db:seed` cmdlet keeps looping, see Appendix E*
+
+# 12. Create a Routes
+
+1. Insert this into `/routes/web.php`
 ```
 php
 
-public function edit($id) {
-    $book = Book::findOrFail($id);
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TaskController;
 
-    return view('book/edit', compact('book') );
+// Add this route for the root URL
+Route::get('/', function () {
+    return view('welcome');
+});
+
+/* "Task" routes
+Route::get('task', [TaskController::class, 'index']);
+Route::get('task/index', [TaskController::class, 'index']);
+Route::get('task/create', [TaskController::class, 'create'])->name('task.create');
+*/
+
+// Resource route for TaskController
+Route::resource('task', TaskController::class);
+```
+Since the **resource** route was used, the other routes were commented out and no need to manually define routes for "task`.
+
+2. Run `php artisan route:list` to check if the routes were created successfully.
+
+3. Open `http://localhost:8000/task` to check if the route is working.
+
+# 13. Create Views
+1. Create a folder named `task` in `resources/views`
+
+2. Create `index.blade.php` in `resources/views/task` and create basic HTML code
+
+3. For `create.blade.php` in `resources/views/task`, insert this into the HTML body
+```
+php
+
+<form action="{{ route('task.store') }}" method="POST">
+    @csrf
+    <label>Name:</label>
+    <input type="text" name="name" required>
+    
+    <label>Duration:</label>
+    <input type="number" name="duration" required>
+    
+    <label>Author:</label>
+    <input type="text" name="author" required>
+    
+    <button type="submit">Add Task</button>
+</form>
+```
+
+4. For `edit.blade.php` in `resources/views/task`, insert this into the HTML body
+```
+php
+<form action="{{ route('task.update', $task->id) }}" method="POST">
+    @csrf
+    @method('PUT') <!-- important for update -->
+    <input type="text" name="name" value="{{ $task->name }}">
+    <input type="number" name="duration" value="{{ $task->duration }}">
+    <input type="text" name="author" value="{{ $task->author }}">
+    <button type="submit">Update Task</button>
+</form>
+```
+
+5. For `show.blade.php` in `resources/views/task`, insert this into the HTML body
+```
+php
+<table border="1" cellpadding="8" cellspacing="0">
+<tr>
+    <th>ID</th>
+    <td>{{ $task->id }}</td>
+</tr>
+<tr>
+    <th>Name</th>
+    <td>{{ $task->name }}</td>
+</tr>
+<tr>
+    <th>Duration</th>
+    <td>{{ $task->duration }}</td>
+</tr>
+<tr>
+    <th>Author</th>
+    <td>{{ $task->author }}</td>
+</tr>
+<tr>
+    <th>Created At</th>
+    <td>{{ $task->created_at }}</td>
+</tr>
+<tr>
+    <th>Updated At</th>
+    <td>{{ $task->updated_at }}</td>
+</tr>
+</table>
+<a href="{{ route('task.index') }}">Back to Task List</a>
+```
+
+6. Create functions at `app/Http/Controllers/TaskController.php`
+```
+php
+
+public function index() {
+    $tasks = Task::all();
+    return view('task.index', compact('tasks'));
+}
+
+public function edit(Task $task) {
+    // Find the task by ID
+    $task = Task::findOrFail($id);
+    // Return the task to the "task/edit" view
+    return view('task.edit', compact('task'));
+}
+
+public function create() {
+    return view('task.create');
+}
+
+public function store (Request $request) {
+    
+    // Validate input data
+    $validatedData = $request->validate([
+        'name' => 'required|string|max:40',
+        'duration' => 'required|integer',
+        'author' => 'required|string|max:40',
+    ]);
+
+    // Create new "task"
+    Task::create($validatedData);
+
+    // Redirect to the task index page with a success message
+    return redirect()->route('task.index')->with('success', 'Task created successfully.');
+}
+
+public function show(Task $task) {
+    return view('task.show', compact('task'));
 }
 ```
+
+7. Test at your localhost site with `/task`, `/task/create` and `/task/edit` at the end of the URL
 
 ___
 
@@ -445,7 +457,7 @@ ___
 
 **Cause:** The `hosts` file in the system32 folder is misconfigured or corrupted.
 
-**Solution:** Run `php -S 127.0.0.1:8000 -t public` to force Laravel Herd to run.
+**Solution:** Make sure that the localhost setting isn't contained in comments (#) and run `php -S 127.0.0.1:8000 -t public` to force Laravel Herd to run.
 
 ## Appendix C
 
@@ -453,7 +465,89 @@ ___
 
 **Cause:** The MySQL service is not running.
 
-**Solution:** Start the MySQL by running `& "C:\Program Files\MySQL\MySQL Server 9.4\bin\mysql.exe" -u root -p`
+**Solution:** Start the MySQL service by running `net start mysql` in the command prompt.
+
+## Appendix D
+**Error:** Query Exception - Access denied for user 'username'@'localhost' (using password: YES)
+
+**Cause:** The user does not have the correct password or privileges to access the database.
+
+**Solution:** *Then run these commands*
+```
+bash
+
+& "C:\Program Files\MySQL\MySQL Server 9.4\bin\mysql.exe" -u root -p
+```
+```
+mysql
+
+SELECT user, host, plugin FROM mysql.user WHERE user = 'edison';
+ALTER USER 'edison'@'localhost' IDENTIFIED WITH caching_sha2_password BY 'admin@12345678';
+GRANT ALL PRIVILEGES ON a2p.* TO 'edison'@'localhost';
+FLUSH PRIVILEGES;
+exit;
+```
+
+## Appendix E
+**Error:** Seeder cmdlet keeps running indefinitely
+
+**Cause:** The `TaskTableSeeder.php` file is misconfigured / incorrect usage of `php artisan db:seed`.
+
+**Solution:** Make sure that `TaskTableSeeder.php` contains this code
+```
+php
+
+public function run(): void {
+    $this->call(TaskTableSeeder::class);
+}
+```
+Then run `php artisan db:seed` instead of `php artisan db:seed --class=TaskTableSeeder`. And **run the command inside** the Seeder file, not anywhere else. Because it may trigger a different Seeder file!
+
+## Appendix F
+**Error:** Seeder cmdlet runs a different Seeder file
+
+**Cause:** The `DatabaseSeeder.php` file is misconfigured / incorrect usage of `php artisan db:seed`.
+
+**Solution:** Make sure that `DatabaseSeeder.php` contains this code
+```
+php
+
+$this->call(TaskTableSeeder::class);
+```
+
+Run `php artisan migrate:fresh --seed` to reset the database and re-apply migration and seeding.
+
+## Appendix G
+**Error:** BindingResolutionException - Target class [App\Http\Controllers\TaskController] does not exist.
+
+**Cause:** The `TaskController.php` file is misconfigured / incorrect usage of `php artisan make:controller`.
+
+**Solution:** Make sure that this code is found at `DatabaseSeeder.php` not `TaskTableSeeder.php`
+```
+php
+
+$this->call(TaskTableSeeder::class);
+```
+*End of Session 2 (04-09-2025)*
+
+## End of Logbook
+
+**Remark:** 
+> It was pure nightmare of day and night of 13-16 hours per session, 6 days total.
+
+> Experienced lots of burnouts, eye strains and hunger withdrawals.
+
+> The Machine Spirit is finally at peace.
+
+> Ignored self-care and health protocols many occassions.
+
+> Currently under "Mind Parliament" supervision (no need to worry about this).
+
+> Logbook had to be re-written entirely due to restarting from square one (many times).
+
+> Up next; Sisyphean task of... doing this for 2nd time -_- X_X
+
+> This was only "practice". No rest for the wicked like me.
 
 ___
 
@@ -464,11 +558,6 @@ ___
 📝 **Note:** 
 
 ___
-
-## Disclaimer
-- The Developer has an interest in Warhammer 40K lore. 
-- Reading the fun text (or not) is up to the reader's choice.
-- Fun text should not disturb actual, non-fun fact, messages and notes left behind.
 
 ## **Footnote:**
 

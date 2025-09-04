@@ -1,12 +1,18 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\BookController;
+use App\Http\Controllers\TaskController;
 
 // Add this route for the root URL
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/book', [BookController::class, 'index'])->name('book.index');
-Route::get('/book/create', [BookController::class, 'create'])->name('book.create');
+/* "Task" routes
+Route::get('task', [TaskController::class, 'index']);
+Route::get('task/index', [TaskController::class, 'index']);
+Route::get('task/create', [TaskController::class, 'create'])->name('task.create');
+*/
+
+// Resource route for TaskController
+Route::resource('task', TaskController::class);
