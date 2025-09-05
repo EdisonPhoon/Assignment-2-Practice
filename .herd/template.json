@@ -1,0 +1,17 @@
+{
+  "name": "Project-Specific Setup",
+  "commands": [
+    {
+        "title": "Migration database",
+        "command": "php artisan migrate --seed"
+    },
+    {
+        "title": "Building assets",
+        "command": "npm run build"
+    },
+    {
+        "title": "Linking storage",
+        "command": "php artisan storage:link"
+    }
+  ]
+}

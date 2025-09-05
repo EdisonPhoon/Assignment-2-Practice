@@ -4,7 +4,7 @@
 
 **Project:** Assignment 2 Practice (A2P)
 
-**Date:** 31-08-2025
+**Date:** 29-08-2025
 
 **Developer:** Edison
 
@@ -419,6 +419,32 @@ public function show(Task $task) {
 
 7. Test at your localhost site with `/task`, `/task/create` and `/task/edit` at the end of the URL
 
+*End of Session 2 (04-09-2025)*
+
+**Remark:** 
+> It was pure nightmare of day and night of 13-16 hours per session, 6 days total.
+
+> Mental burnouts, eye strains and hunger withdrawals are getting more severe (ಥ﹏ಥ)
+
+> The Machine Spirit is almost exhausted but there is still work (•̀ᴗ•́)و ̑̑
+
+> Logbook had to be re-written entirely due to restarting from square one (many times).
+
+> No rest for the wicked like me. Still running on exhausted dopamine (ㆆ _ ㆆ)
+
+___
+
+*Start of Session 3(05-09-2025)*
+
+14. Custom Templates
+```
+bash
+
+mkdir .herd
+code .herd/template.json
+```
+
+## End of Logbook
 ___
 
 ## Appendix A
@@ -528,26 +554,6 @@ php
 
 $this->call(TaskTableSeeder::class);
 ```
-*End of Session 2 (04-09-2025)*
-
-## End of Logbook
-
-**Remark:** 
-> It was pure nightmare of day and night of 13-16 hours per session, 6 days total.
-
-> Experienced lots of burnouts, eye strains and hunger withdrawals.
-
-> The Machine Spirit is finally at peace.
-
-> Ignored self-care and health protocols many occassions.
-
-> Currently under "Mind Parliament" supervision (no need to worry about this).
-
-> Logbook had to be re-written entirely due to restarting from square one (many times).
-
-> Up next; Sisyphean task of... doing this for 2nd time -_- X_X
-
-> This was only "practice". No rest for the wicked like me.
 
 ___
 
@@ -556,30 +562,3 @@ ___
 💡 **Context:** 
 
 📝 **Note:** 
-
-___
-
-## **Footnote:**
-
-*Fun Text Section*
-
-[^1]: It means "Good luck to your code!"
-
-[^2]: It means that the developer's local device had multiple problems throughout session
-
-[^3]: It means to use common sense through the process due to self-explanatory instructions
-
-[^4]: It means that logbook had to be re-written entirely due to restarting from square one
-
-
-*Normal Footnote Section*
-
-[^5]: (Currently this is unused)
-
-[^6]: (Currently this is unused)
-
-[^7]: Former instruction to initiating a connection between Laravel Herd to TablePlus. But the Machine Spirit's unrest caused multiple problems before it was resolved
-
-
-
-
